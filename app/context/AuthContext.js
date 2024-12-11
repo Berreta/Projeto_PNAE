@@ -4,8 +4,9 @@ import AsyncStorage from '@react-native-async-storage/async-storage'; // Importa
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-    const [user, setUser] = useState(null);
+    const [user, setUser] = useState();
     const [loading, setLoading] = useState(true);
+    const [auth, setAuth] = useState();
 
     useEffect(() => {
         // Verificar se há um token salvo, mas sem fazer requisição imediata à API
@@ -13,7 +14,7 @@ export const AuthProvider = ({ children }) => {
             const token = await AsyncStorage.getItem('token');
             if (token) {
                 // O token está presente, portanto, devemos verificar se ele é válido.
-                setUser({ isAuthenticated: true });
+                setAuth({ isAuthenticated: true });
             }
             setLoading(false); // Finaliza o loading após a verificação do token
         };
@@ -23,23 +24,24 @@ export const AuthProvider = ({ children }) => {
 
     const login = async (email, password) => {
         try {
-            const response = await fetch('http://localhost:5000/api/login', {
+            const response = await fetch('https://serverpnae.winglet.app/login', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ email, password }),
             });
 
             const data = await response.json();
+
             if (response.ok) {
-                await AsyncStorage.setItem('token', data.token); // Armazena o token
+                await AsyncStorage.setItem('token', data.token);
                 setUser({ 
                     id: data.userId, 
                     email: data.email, 
                     isAdmin: data.isAdmin, 
                     name: data.name, 
                     company_role: data.company_role, 
-                    profile_picture: data.profile_picture 
                 });
+
             } else {
                 throw new Error(JSON.stringify(data));
             }
@@ -49,12 +51,12 @@ export const AuthProvider = ({ children }) => {
     };
 
     const logout = async () => {
-        await AsyncStorage.removeItem('token'); // Remove o token
+        await AsyncStorage.removeItem('token');
         setUser(null);
-    };
+    }; 
 
     return (
-        <AuthContext.Provider value={{ user, loading, login, logout }}>
+        <AuthContext.Provider value={{ auth, user, loading, login, logout }}>
             {children}
         </AuthContext.Provider>
     );

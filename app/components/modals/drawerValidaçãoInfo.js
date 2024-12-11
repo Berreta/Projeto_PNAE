@@ -1,7 +1,7 @@
 import React , { useState } from 'react';
 import { View, StyleSheet, Modal, Image, Text } from 'react-native';
 import { TextInput, Button } from 'react-native-paper';
-import { useAuth } from '../../../context/AuthContext';
+import { useAuth } from '../../context/AuthContext';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import PasswordResetModal from '../modals/passwordResetModal';
 

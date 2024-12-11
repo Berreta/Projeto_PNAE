@@ -1,3 +1,4 @@
+{/*
 import React, { useState, useEffect, useRef } from 'react';
 import { Modal, View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { Camera, CameraType } from 'expo-camera/legacy';
@@ -40,7 +41,7 @@ const CameraModal = ({ visible, onClose, onCapture }) => {
           <Camera style={styles.camera} type={type} ref={cameraRef}>
             <View style={styles.buttonsContainer}>
               <TouchableOpacity style={styles.captureButton} onPress={handleCapture}>
-                {/* <Text style={styles.captureText}>Capturar Foto</Text> */}
+
               </TouchableOpacity>
               <TouchableOpacity style={styles.closeButton} onPress={onClose}>
                 <Text style={styles.closeText}>Fechar</Text>
@@ -103,3 +104,4 @@ const styles = StyleSheet.create({
 });
 
 export default CameraModal;
+*/}

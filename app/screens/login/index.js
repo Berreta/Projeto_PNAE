@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useRouter } from 'expo-router';
-import { useAuth } from '../../../context/AuthContext';
-import { View, Image, Alert, Linking } from 'react-native';
+import { useAuth } from '../../context/AuthContext';
+import { View, Image } from 'react-native';
 import { TextInput, Text } from 'react-native-paper';
 import styles from './styles';
 import { TouchableOpacity } from 'react-native';
@@ -9,7 +9,7 @@ import { call } from '../../utils/callphoneFunction';
 import Toast from 'react-native-toast-message';
 import DrawerRecoverAccessModal from '../../components/modals/drawerValidaçãoInfo';
 
-const LoginScreen = () => {
+const LoginScreen = () => { 
 
     const router = useRouter();
     const [username, setUsername] = useState('Insira sua matrícula');
@@ -19,6 +19,7 @@ const LoginScreen = () => {
     const [showPassword, setShowPassword] = useState(false);
     const [modalVisible, setModalVisible] = useState(false);
 
+    {/* Call phone function */}
     const handleCall = () => {
         call();
     }
@@ -32,18 +33,22 @@ const LoginScreen = () => {
                 type: 'error',
                 position: 'bottom',
                 text1: 'Preencha todos os campos!',
-                //backgroundImage: 'black',
             });
             return;
         }
 
         try {
             setLoading(true);
-            await login(username,password);
+            await login(username, password);
             router.replace('/screens/home');
         } catch (error) {
-            router.replace('/screens/home');//remover
-            console.log('Credenciais invalidas!!');
+            Toast.show({
+                type: 'error',
+                position: 'bottom',
+                text1: 'Crendenciais inválidas.',
+                text2: 'Tente novamente!'
+            });
+            console.error(error);
         } finally {
             setLoading(false);
         }

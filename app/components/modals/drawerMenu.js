@@ -1,7 +1,7 @@
 import React, {useState} from 'react';
 import { View, Text,TouchableOpacity, StyleSheet, Modal, Image  } from 'react-native';
 import { Button, Avatar } from 'react-native-paper';
-import { useAuth } from '../../../context/AuthContext';
+import { useAuth } from '../../context/AuthContext';
 import { useRouter } from 'expo-router';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -20,7 +20,7 @@ const DrawerMenuModal = ({ visible, onClose }) => {
     handleLogout = async () => {
         try {
             await logout();
-            //sessionStorage.clear();
+            AsyncStorage.clear();
             router.replace('screens/login');
         } catch {
             console.error('Error sign out');
@@ -39,67 +39,72 @@ const DrawerMenuModal = ({ visible, onClose }) => {
         <Modal
             transparent={true}
             onRequestClose={onClose}
-            visible={visible}>
+            visible={visible}
+            >
+                
+            <View
+            style={styles.container}
+            >
+                <View style={styles.modalContent}>
+                    <View style={styles.headerContainer}>
+                        <Avatar.Image 
+                            style={styles.avatarImagem}
+                            size={42}
+                            source={require('../../../assets/images/_Avatar_.png')}
+                        />
+                        <Button
+                            style={styles.closeButton}
+                            onPress={handleClose}
+                            icon="close"
+                            mode='text'
+                            labelStyle={{ color: '#fff' }} 
+                            iconStyle={{ color: '#fff'}}
+                        />
+                    </View>
 
-            <View style={styles.modalContent}>
-                <View style={styles.headerContainer}>
-                    <Avatar.Image 
-                        style={styles.avatarImagem}
-                        size={42}
-                        source={require('../../../assets/images/_Avatar_.png')}
-                    />
-                    <Button
-                        style={styles.closeButton}
-                        onPress={handleClose}
-                        icon="close"
-                        mode='text'
-                        labelStyle={{ color: '#fff' }} 
-                        iconStyle={{ color: '#fff'}}
-                    />
-                </View>
+                    {/* Messages */}
+                    <View style={styles.mssgContainer}>
+                        <Text style={styles.mssgUser}>Olá, {user?.name || 'Usuário'}</Text>
+                        <Text style={styles.mssgCompany}>Um ótimo voo, começa com você.</Text>
+                    </View>
 
-                {/* Messages */}
-                <View style={styles.mssgContainer}>
-                    <Text style={styles.mssgUser}>Olá, {user?.name || 'Usuário'}</Text>
-                    <Text style={styles.mssgCompany}>Um ótimo voo, começa com você.</Text>
-                </View>
+                    {/* Menu */}
+                    <View style={styles.menuContainer}>
+                        <TouchableOpacity 
+                            style={styles.buttonContainer}
+                            labelStyle={{ color: '#fff' }} 
+                            onPress={handleDrawerPerfil}>
 
-                {/* Menu */}
-                <View style={styles.menuContainer}>
-                    <TouchableOpacity 
+                            <Icon name="person" size={20} color={"#fff"} style={styles.margin}/>
+                            <Text style={styles.textButton}>MEU PERFIL</Text>
+                        </TouchableOpacity>
+
+                        <View style={styles.lineStyle} />
+
+                        <TouchableOpacity
                         style={styles.buttonContainer}
-                        labelStyle={{ color: '#fff' }} 
-                        onPress={handleDrawerPerfil}>
+                            labelStyle={{ color: '#fff' }} 
+                            onPress={handleCall}>
 
-                        <Icon name="person" size={20} color={"#fff"} style={styles.margin}/>
-                        <Text style={styles.textButton}>MEU PERFIL</Text>
-                    </TouchableOpacity>
+                            <Icon name="headset" size={20} color={"#fff"} style={styles.margin}/>
+                            <Text style={styles.textButton}>SUPORTE</Text>
+                        </TouchableOpacity>
 
-                    <View style={styles.lineStyle} />
+                        <View style={styles.lineStyle} />
 
-                    <TouchableOpacity
-                    style={styles.buttonContainer}
-                        labelStyle={{ color: '#fff' }} 
-                        onPress={handleCall}>
+                        <TouchableOpacity 
+                            style={styles.buttonContainer}
+                            labelStyle={{ color: '#fff' }} 
+                            onPress={handleLogout}>
 
-                        <Icon name="headset" size={20} color={"#fff"} style={styles.margin}/>
-                        <Text style={styles.textButton}>SUPORTE</Text>
-                    </TouchableOpacity>
-
-                    <View style={styles.lineStyle} />
-
-                    <TouchableOpacity 
-                        style={styles.buttonContainer}
-                        labelStyle={{ color: '#fff' }} 
-                        onPress={handleLogout}>
-
-                        <Icon name="logout" size={20} color={"#fff"} style={styles.margin}/>
-                        <Text style={styles.textButton}>SAIR</Text>
-                    </TouchableOpacity>
-                    <DrawerPerfilModal 
-                        visible={modalVisible}
-                        onClose={() => setModalVisible(false)}
-                    />  
+                            <Icon name="logout" size={20} color={"#fff"} style={styles.margin}/>
+                            <Text style={styles.textButton}>SAIR</Text>
+                        </TouchableOpacity>
+                        <DrawerPerfilModal 
+                            visible={modalVisible}
+                            onClose={() => setModalVisible(false)}
+                        />  
+                    </View>
                 </View>
             </View>
         </Modal>
@@ -109,9 +114,9 @@ const DrawerMenuModal = ({ visible, onClose }) => {
 const styles = StyleSheet.create({
     container: {
        flex: 1,
-       justifyContent: 'center',
-       alignItems: 'center',
-       backgroundColor: 'rgba(0, 0, 0, 1)',
+       justifyContent: 'left',
+       alignItems: 'left',
+       backgroundColor: 'rgba(0, 0, 0, 0.5)',
        zIndex: 0,
     },
     modalContent: {
@@ -146,7 +151,7 @@ const styles = StyleSheet.create({
         left: '4%',
     },
     closeButton: {
-        left: '320%',
+        left: '68%',
     },
     menuContainer: {
         top: '10%',

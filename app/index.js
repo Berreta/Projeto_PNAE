@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import * as SplashScreen from 'expo-splash-screen';
-import { AuthProvider } from '../context/AuthContext'; 
+import { AuthProvider } from './context/AuthContext'; 
 import SplashScreenComponent from './screens/splashScreen'; 
 import LoginScreen from './screens/login';
 

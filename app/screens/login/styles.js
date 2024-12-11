@@ -9,7 +9,7 @@ const styles = StyleSheet.create({
     },
     backgroundImage: {
         width: '110%',
-        height: '38%',
+        height: 320,
         position: 'absolute',
         top: -10,
         left: -10,
@@ -19,8 +19,8 @@ const styles = StyleSheet.create({
         position: 'relative',
         left: '25%',
         top: '0%',
-        width: 180, 
-        height: 180, 
+        width: 170, 
+        height: 170, 
         zIndex: 2,      
     },
     form: {

@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, Modal, TouchableOpacity, Image, KeyboardAvoidingView, ScrollView, Platform } from 'react-native';
 import { TextInput, RadioButton } from 'react-native-paper';
-import iconButton from '../../../assets/images/img_vector.png';
-import CameraModal from './camera';
-import MultiSelectInput from '../MultiSelectInput';
+// import iconButton from '../../../assets/images/img_vector.png';
+// import CameraModal from './camera';
+// import MultiSelectInput from '../MultiSelectInput';
 
 const AddServiceModal = ({ visible, onClose }) => {
     // Valores iniciais para os estados
@@ -19,14 +19,13 @@ const AddServiceModal = ({ visible, onClose }) => {
     };
 
     const serviceOptions = [
-        'Serviço A',
-        'Serviço B',
-        'Serviço C',
-        'Serviço D',
+        'BLND', 'DEAF', 'DPNA', 'ESAN', 'EXST', 'MAAS', 
+        'MEDA', 'OXYG', 'PETC', 'PPOC', 'STCR', 'SVAN', 
+        'TEEN', 'UMNR', 'WCBD', 'WCBW', 'WCHC', 'WCHR', 
+        'WCHS', 'WCLB', 'WCMP', 'WCOB',
       ];
 
       const ciaNameOptions = [
- 
         'Air France',
         'American Airlanes',
         'Delta Airlanes',
@@ -36,7 +35,7 @@ const AddServiceModal = ({ visible, onClose }) => {
         'Latam',
         'Swiss',
         'United',
-      ]
+      ];
 
     const [service, setService] = useState(initialState.service);
     const [flightNumber, setFlightNumber] = useState(initialState.flightNumber);
@@ -45,13 +44,13 @@ const AddServiceModal = ({ visible, onClose }) => {
     const [gate, setGate] = useState(initialState.gate);
     const [type, setType] = useState(initialState.type);
     const [occurrence, setOccurence] = useState(initialState.occurrence);
-    const [photo, setPhoto] = useState(initialState.photo);
-    const [isCameraModalVisible, setIsCameraModalVisible] = useState(false);
+    // const [photo, setPhoto] = useState(initialState.photo);
+    // const [isCameraModalVisible, setIsCameraModalVisible] = useState(false);
 
-    const handleCapture = (capturedPhotoUri) => {
-        setPhoto(capturedPhotoUri);
-        setIsCameraModalVisible(false);
-    };
+    // const handleCapture = (capturedPhotoUri) => {
+    //     setPhoto(capturedPhotoUri);
+    //     setIsCameraModalVisible(false);
+    // };
 
     // Resetar os campos para os valores iniciais quando o modal for fechado
     const handleClose = () => {
@@ -62,7 +61,7 @@ const AddServiceModal = ({ visible, onClose }) => {
         setGate(initialState.gate);
         setType(initialState.type);
         setOccurence(initialState.occurrence);
-        setPhoto(initialState.photo);
+        // setPhoto(initialState.photo);
         onClose();  // Chama a função onClose passada por props
     };
 
@@ -205,7 +204,7 @@ const AddServiceModal = ({ visible, onClose }) => {
                                     mode="outlined"
                                 />
 
-                                {/* Show photo */}
+                                {/* Show photo *
                                 {photo ? (
                                     <View style={styles.previewContainer}>
                                         <Text>Foto Capturada:</Text>
@@ -226,7 +225,7 @@ const AddServiceModal = ({ visible, onClose }) => {
                                     visible={isCameraModalVisible}
                                     onClose={() => setIsCameraModalVisible(false)}
                                     onCapture={handleCapture}
-                                />
+                                />*/}
                             </View>
 
                             <View style={styles.footer}>

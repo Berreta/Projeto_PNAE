@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { View, Text, FlatList, Image, TextInput, TouchableOpacity } from 'react-native';
-import { useAuth } from '../../../context/AuthContext';
+import { useAuth } from '../../context/AuthContext';
 import { FAB, Button, Avatar } from 'react-native-paper';
 import styles from './styles';
 import AddServiceModal from '../../components/modals/addService';
@@ -8,6 +8,7 @@ import ItemDetailsModal from '../../components/modals/itemDetails';
 import CheckoutServiceModal from '../../components/modals/checkoutService'
 import DrawerMenuModal from '../../components/modals/drawerMenu';
 import Icon from 'react-native-vector-icons/MaterialIcons';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const HomeScreen = () => {
     const { user } = useAuth();
@@ -36,12 +37,42 @@ const HomeScreen = () => {
         { id: '12', flyNumber: 'LA 3439', type: 'Desembarque', seatPassenger: '25G', service: 'WCHR+', gate: '267', status: 'Finalizado' },
     ];
 
+    // useEffect(() => {
+    //     const fetchData = async () => {
+    //         setItems(exampleData);
+    //         setFilteredItems(exampleData.filter(item => item.status.toLowerCase() === 'iniciado'));
+    //     };
+    //     fetchData();
+    // }, []);
+
+
     useEffect(() => {
-        const fetchData = async () => {
-            setItems(exampleData);
-            setFilteredItems(exampleData.filter(item => item.status.toLowerCase() === 'iniciado'));
-        };
-        fetchData();
+        const fetchData = async() {
+            try {
+                const token = AsyncStorage.getItem("token");
+
+                if(!token) {
+                    throw new Error("No token available");
+                }
+
+                const response = await fetch('https://serverpnae.winglet.app/atendimentos',{
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                });
+                if(!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const data = await response.json();
+                setItems(data);
+                setFilteredItems(data.filter(item => item.status.toLowerCase() === 'ongoing'));
+
+            } catch(error) {
+                console.error("Request error", error);
+                setItems([]);
+            };
+            fetchData();
+        }
     }, []);
 
     const filterItems = (mode) => {
@@ -60,7 +91,7 @@ const HomeScreen = () => {
         setSearchText(text);
         if (activeMode === 'history') {
             const filtered = items.filter(item =>
-                item.status.toLowerCase() === 'finalizado' &&
+                item.status.toLowerCase() === 'finished' &&
                 (
                     item.flyNumber.includes(text) || 
                     item.type.includes(text) ||
@@ -73,8 +104,9 @@ const HomeScreen = () => {
         }
     };
 
+    {/* Set color status */}
     const getStatusColor = (status) => {
-        return status.toLowerCase() === 'iniciado' ? '#0090d6' : '#4caf50';
+        return status.toLowerCase() === 'ongoing' ? '#0090d6' : '#4caf50';
     };
 
     {/* Search input to filter the recycle list */}
@@ -100,128 +132,129 @@ const HomeScreen = () => {
         activeMode === 'ongoing' ? setCheckoutModalVisible(true) : setItemDetailsModalVisible(true);
     };
 
-    handleDrawerMenu = () => {
+    const handleDrawerMenu = () => {
         setDrawerModalVisible(true);
     };
 
     return (
         <View style={styles.container}>
             <View style={styles.rectangleLayout} />
+                <View style={styles.contentView}>
+                    {/* Header */}
+                    <View style={styles.header}>
+                        <Button style={styles.drawerButton}
+                            icon="menu"
+                            mode='text'
+                            labelStyle={{ color: '#fff' }} 
+                            iconStyle={{ color: '#fff', fontSize: 20 }}
+                            onPress={handleDrawerMenu}
+                        />
+                        <Text style={styles.title}>ATENDIMENTO PNAE</Text>
+                        <Avatar.Image 
+                            style={styles.avatarImagem}
+                            size={42}
+                            source={require('../../../assets/images/_Avatar_.png')}
+                        />
+                    </View>
 
-            {/* Header */}
-            <View style={styles.header}>
-                <Button style={styles.drawerButton}
-                    icon="menu"
-                    mode='text'
-                    labelStyle={{ color: '#fff' }} 
-                    iconStyle={{ color: '#fff', fontSize: 20 }}
-                    onPress={handleDrawerMenu}
-                />
-                <Text style={styles.title}>ATENDIMENTO PNAE</Text>
-                <Avatar.Image 
-                    style={styles.avatarImagem}
-                    size={42}
-                    source={require('../../../assets/images/_Avatar_.png')}
-                />
-            </View>
+                    {/* Welcome Mssg View */}
+                    <View style={styles.welcomeMssgContainer}>
+                        <Text style={styles.welcomeUser}>Olá, {user?.name || 'Usuário'}!</Text>
+                        <Text style={styles.welcomeMssg}>Gerencie sua fila de atendimentos aqui:</Text>
+                    </View>
 
-            {/* Welcome Mssg View */}
-            <View style={styles.welcomeMssgContainer}>
-                <Text style={styles.welcomeUser}>Olá, {user?.name || 'Usuário'}!</Text>
-                <Text style={styles.welcomeMssg}>Gerencie sua fila de atendimentos aqui:</Text>
-            </View>
+                    {/* Buttons to filter the recycle list */}
+                    <View style={styles.buttonContainer}>
+                        <View style={styles.buttonView}>
+                            <TouchableOpacity 
+                            style={[styles.buttonFilter]}
+                            labelStyle={{ color: '#fff' }} 
+                            onPress={() => filterItems('ongoing')}
+                            >
+                            <Icon name="people" size={15} color="#fff" />
+                            <Text style={styles.buttonFilterText}>Em Andamento</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity 
+                            style={[styles.buttonFilter]}
+                            labelStyle={{ color: '#fff' }} 
+                            onPress={() => filterItems('history')}
+                            >
+                            <Icon name="history" size={15} color="#fff" />
+                            <Text style={styles.buttonFilterText}>Histórico</Text>
+                            </TouchableOpacity>
+                        </View>
+                    </View>
 
-            {/* Buttons to filter the recycle list */}
-            <View style={styles.buttonContainer}>
-                <View style={styles.buttonView}>
-                    <TouchableOpacity 
-                    style={[styles.buttonFilter]}
-                    labelStyle={{ color: '#fff' }} 
-                    onPress={() => filterItems('ongoing')}
-                    >
-                    <Icon name="people" size={15} color="#fff" />
-                    <Text style={styles.buttonFilterText}>Em Andamento</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity 
-                    style={[styles.buttonFilter]}
-                    labelStyle={{ color: '#fff' }} 
-                    onPress={() => filterItems('history')}
-                    >
-                    <Icon name="history" size={15} color="#fff" />
-                    <Text style={styles.buttonFilterText}>Histórico</Text>
-                    </TouchableOpacity>
-                </View>
-            </View>
+                    {/* Recycle list */}
+                    <View style={styles.rectangleList}>
+                        <View>{renderHeader()}</View>
+                        
+                        <FlatList
+                            data={filteredItems}
+                            renderItem={({ item }) => (
+                                <TouchableOpacity style={styles.item} onPress={() => handleItemPress(item)}>
+                                    <View style={styles.leftSection}>
+                                        <Text style={styles.flyNumber}>{item.flyNumber}</Text>
+                                        <Text style={styles.type}>{item.type}</Text>
+                                    </View>
+                                    <View style={styles.middleSection}>
+                                        <Text style={styles.seatPassenger}>{item.seatPassenger}</Text>
+                                        <Text style={styles.service}>{item.service}</Text>
+                                    </View>
+                                    <View style={styles.rightSection}>
+                                        <Text style={styles.gateLabel}>Portão</Text>
+                                        <Text style={styles.gate}>{item.gate}</Text>
+                                    </View>
+                                    <View style={styles.statusSection}>
+                                        <View style={[styles.statusCircle, { backgroundColor: getStatusColor(item.status) }]} />
+                                    </View>
+                                </TouchableOpacity>
+                            )}
+                        />
+                    </View>
 
-            {/* Recycle list */}
-            <View style={styles.rectangleList}>
-                <View>{renderHeader()}</View>
-                
-                <FlatList
-                    data={filteredItems}
-                    renderItem={({ item }) => (
-                        <TouchableOpacity style={styles.item} onPress={() => handleItemPress(item)}>
-                            <View style={styles.leftSection}>
-                                <Text style={styles.flyNumber}>{item.flyNumber}</Text>
-                                <Text style={styles.type}>{item.type}</Text>
-                            </View>
-                            <View style={styles.middleSection}>
-                                <Text style={styles.seatPassenger}>{item.seatPassenger}</Text>
-                                <Text style={styles.service}>{item.service}</Text>
-                            </View>
-                            <View style={styles.rightSection}>
-                                <Text style={styles.gateLabel}>Portão</Text>
-                                <Text style={styles.gate}>{item.gate}</Text>
-                            </View>
-                            <View style={styles.statusSection}>
-                                <View style={[styles.statusCircle, { backgroundColor: getStatusColor(item.status) }]} />
-                            </View>
-                        </TouchableOpacity>
+                    {/* Button FAB to start a new service */}
+                    {activeMode === 'ongoing' && (
+                        <FAB
+                            style={styles.fab}
+                            icon="plus"
+                            onPress={() => setAddServiceModalVisible(true)}
+                        />                
                     )}
-                />
-            </View>
 
-            {/* Button FAB to start a new service */}
-            {activeMode === 'ongoing' && (
-                <FAB
-                    style={styles.fab}
-                    icon="plus"
-                    onPress={() => setAddServiceModalVisible(true)}
-                />                
-            )}
+                    {/* Fecha o modal para adicionar um serviço */}
+                    <AddServiceModal 
+                        visible={addServiceModalVisible} 
+                        onClose={() => setAddServiceModalVisible(false)}
+                    />
 
-            {/* Fecha o modal para adicionar um serviço */}
-            <AddServiceModal 
-                visible={addServiceModalVisible} 
-                onClose={() => setAddServiceModalVisible(false)}
-            />
+                    {/* Checkout Modal */}
+                    <CheckoutServiceModal 
+                        visible={checkoutModalVisible}
+                        onClose={() => setCheckoutModalVisible(false)}
+                        item={selectedItem}
+                    />
 
-            {/* Checkout Modal */}
-            <CheckoutServiceModal 
-                visible={checkoutModalVisible}
-                onClose={() => setCheckoutModalVisible(false)}
-                item={selectedItem}
-            />
+                    {/* Modal para detalhes do item */}
+                    <ItemDetailsModal 
+                        visible={itemDetailsModalVisible} 
+                        onClose={() => setItemDetailsModalVisible(false)} 
+                        item={selectedItem}
+                    />
 
-            {/* Modal para detalhes do item */}
-            <ItemDetailsModal 
-                visible={itemDetailsModalVisible} 
-                onClose={() => setItemDetailsModalVisible(false)} 
-                item={selectedItem}
-            />
+                    <DrawerMenuModal 
+                        visible={drawerModalVisible}
+                        onClose={() => setDrawerModalVisible(false)}
+                    />            
 
-            <DrawerMenuModal 
-                visible={drawerModalVisible}
-                onClose={() => setDrawerModalVisible(false)}
-            />            
-
-            <View style={styles.logoContainer}>
-                <Image
-                    source={require('../../../assets/images/Winglet-Logotipo-Reduzido.png')}
-                    style={styles.logo}
-                    resizeMode="contain"       
-                />
-            </View>
+                    <View style={styles.logoContainer}>
+                        <Image
+                            source={require('../../../assets/images/Winglet-Logotipo-Reduzido.png')}
+                            style={styles.logo}
+                            resizeMode="contain"       
+                        />
+                    </View>
+                </View>
         </View>
     );
 };

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { View, TouchableOpacity, StyleSheet, Modal } from 'react-native';
 import { TextInput, Text } from 'react-native-paper';
 import { Button, Avatar } from 'react-native-paper';
-import { useAuth } from '../../../context/AuthContext';
+import { useAuth } from '../../context/AuthContext';
 import { useRouter } from 'expo-router';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -32,7 +32,7 @@ const DrawerPerfilModal = ({ visible, onClose }) => {
     handleLogout = async () => {
         try {
             await logout();
-            //sessionStorage.clear();
+            sessionStorage.clear();
             router.replace('screens/login');
         } catch {
             console.error('Error sign out');

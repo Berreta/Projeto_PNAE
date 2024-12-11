@@ -9,7 +9,7 @@ const styles = StyleSheet.create({
     rectangleLayout: {
         backgroundColor: '#0B4B6F',
         width: '100%',
-        height: '70%',
+        height: 610,
         position: 'absolute',
         top: 0,
         left: 0,
@@ -18,12 +18,15 @@ const styles = StyleSheet.create({
         overflow: 'hidden', 
         zIndex: 0,
     },
+    contentView: {
+
+    },
     rectangleList: {
         backgroundColor: '#FFF',
         width: '90%',
-        height: '60%',
+        height: 520,
         position: 'absolute',
-        top: '28%',
+        top: 210,
         left: 20,     
         borderTopRightRadius: 20,
         borderTopLeftRadius: 20,
@@ -53,7 +56,7 @@ const styles = StyleSheet.create({
     welcomeMssgContainer: {
         position: 'absolute',
         width: '90%',                // O container ocupará 90% da largura
-        top: '10%',                   // Margem superior de 8%
+        top: 80,
         left: '5%',                  // Alinha o container com 5% da borda esquerda (para centralizar com 'right' 5%)
         right: '5%',                 // Alinha o container com 5% da borda direita (para centralizar)
  
@@ -76,9 +79,9 @@ const styles = StyleSheet.create({
         flexDirection: 'row',               // Organiza os botões horizontalmente
         justifyContent: 'space-between',    // Cria um espaçamento entre os botões
         width: '90%',                       // O container ocupará 90% da largura da tela
-        height: '8%',                       // O container ocupará 8% da altura da tela (altura dos botões)
+        height: 50,                       // O container ocupará 8% da altura da tela (altura dos botões)
         position: 'absolute',               // Para que o container tenha uma posição fixa
-        top: '18%',                         // Distância de 26% do topo da tela
+        top: 140,                         // Distância de 26% do topo da tela
         left: '5%',                          // Adiciona uma margem à esquerda (para centralizar)
         right: '5%',                         // Adiciona uma margem à direita (para centralizar)
         alignItems: 'center',               // Alinha os botões no centro verticalmente
@@ -188,7 +191,8 @@ const styles = StyleSheet.create({
         padding: 8,
     },
     fab: {
-        position: 'absolute',
+        position: 'relative',
+        top: 610,
         margin: 16,
         left: '46%', // Centraliza horizontalmente
         bottom: '6%',
@@ -207,7 +211,7 @@ const styles = StyleSheet.create({
     
     logoContainer: {
         position: 'absolute',
-        bottom: 0,
+        top: 700,
         left: 0,
         right: 0,
         justifyContent: 'center',
@@ -215,13 +219,12 @@ const styles = StyleSheet.create({
         marginTop: 80,
         flex: 1,
         height: '8%',
+        zIndex: 2
     },
     logo: { 
         width: 80, 
         height: 80, 
     },
-
-
 });
 
 export default styles;
