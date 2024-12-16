@@ -9,17 +9,14 @@ export const AuthProvider = ({ children }) => {
     const [auth, setAuth] = useState();
 
     useEffect(() => {
-        // Verificar se há um token salvo, mas sem fazer requisição imediata à API
         const checkToken = async () => {
             const token = await AsyncStorage.getItem('token');
             if (token) {
-                // O token está presente, portanto, devemos verificar se ele é válido.
                 setAuth({ isAuthenticated: true });
             }
-            setLoading(false); // Finaliza o loading após a verificação do token
+            setLoading(false);
         };
-
-        checkToken(); // Chama a função que verifica o token
+        checkToken();
     }, []);
 
     const login = async (email, password) => {

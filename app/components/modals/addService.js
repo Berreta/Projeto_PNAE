@@ -1,12 +1,17 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, Modal, TouchableOpacity, Image, KeyboardAvoidingView, ScrollView, Platform } from 'react-native';
 import { TextInput, RadioButton } from 'react-native-paper';
+import { useAuth } from '../../context/AuthContext'
+
 // import iconButton from '../../../assets/images/img_vector.png';
 // import CameraModal from './camera';
 // import MultiSelectInput from '../MultiSelectInput';
 
 const AddServiceModal = ({ visible, onClose }) => {
-    // Valores iniciais para os estados
+    
+    const { user } = useAuth();
+
+
     const initialState = {
         service: 'WCHR, BLND...',
         flightNumber: 'LA3311',
@@ -16,6 +21,10 @@ const AddServiceModal = ({ visible, onClose }) => {
         type: 'Embarque',
         occurrence: 'Passageiro estrangeiro, origem Itália. Fala e entende pouco português.',
         photo: null,
+        dispense: '0',
+        statusService: 'ongoing',
+        additionalService: '0',
+        connectionFlight: '0',
     };
 
     const serviceOptions = [
@@ -44,6 +53,8 @@ const AddServiceModal = ({ visible, onClose }) => {
     const [gate, setGate] = useState(initialState.gate);
     const [type, setType] = useState(initialState.type);
     const [occurrence, setOccurence] = useState(initialState.occurrence);
+    const [statusService, setStatusService] = useState(initialState.statusService);
+    const [userID, setUserID] = useState(user.id);
     // const [photo, setPhoto] = useState(initialState.photo);
     // const [isCameraModalVisible, setIsCameraModalVisible] = useState(false);
 
@@ -62,22 +73,31 @@ const AddServiceModal = ({ visible, onClose }) => {
         setType(initialState.type);
         setOccurence(initialState.occurrence);
         // setPhoto(initialState.photo);
-        onClose();  // Chama a função onClose passada por props
+        setStatusService(initialState.statusService);
+        onClose(); 
     };
 
     const handleSave = async () => {
         const data = {
-            service,
-            flightNumber,
             ciaName,
-            seatNumber,
             gate,
-            type,
             occurrence,
+            type,
+            seatNumber,
+            flightNumber,
+            additionalService,
+            connectionFlight,
+            //boardingCardPicture,
+            service,
+            statusService,
+            occurrence,
+            gate,
+            dispense,
+            userID,
         };
 
         try {
-            const response = await fetch('https://sua-api-endpoint.com/atendimentos', {
+            const response = await fetch('https://serverpnae.winglet.app/novoAtendimento', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -85,14 +105,17 @@ const AddServiceModal = ({ visible, onClose }) => {
                 body: JSON.stringify(data),
             });
 
+            console.log(data)
+
             if (!response.ok) {
                 throw new Error('Erro ao enviar dados');
             }
 
             const responseData = await response.json();
+
             console.log('Dados enviados com sucesso:', responseData);
-            //Adicionar toast de sucesso
-            handleClose();  // Resetar o estado e fechar o modal
+
+            handleClose();
         } catch (error) {
             console.error('Erro ao enviar dados:', error);
         }

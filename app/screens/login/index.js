@@ -39,7 +39,7 @@ const LoginScreen = () => {
 
         try {
             setLoading(true);
-            await login(username, password);
+            await login(username.trim().toLocaleLowerCase(), password);
             router.replace('/screens/home');
         } catch (error) {
             Toast.show({
@@ -48,7 +48,7 @@ const LoginScreen = () => {
                 text1: 'Crendenciais inválidas.',
                 text2: 'Tente novamente!'
             });
-            console.error(error);
+
         } finally {
             setLoading(false);
         }

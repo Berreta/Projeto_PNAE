@@ -22,67 +22,53 @@ const HomeScreen = () => {
     const [drawerModalVisible, setDrawerModalVisible] = useState(false);
     const [selectedItem, setSelectedItem] = useState(null);
 
-    {/* Fake data */}
-    const exampleData = [
-        { id: '1', flyNumber: 'LA 3429', type: 'Desembarque', seatPassenger: '25D', service: 'WCHR+', gate: '256', status: 'Iniciado' },
-        { id: '2', flyNumber: 'LA 3430', type: 'Embarque', seatPassenger: '11E', service: 'WCHR+', gate: '257', status: 'Iniciado' },
-        { id: '4', flyNumber: 'LA 3431', type: 'Desembarque', seatPassenger: '14A', service: 'WCHR+', gate: '259', status: 'Finalizado' },
-        { id: '5', flyNumber: 'LA 3432', type: 'Embarque', seatPassenger: '13R', service: 'WCHR+', gate: '260', status: 'Finalizado' },
-        { id: '6', flyNumber: 'LA 3433', type: 'Desembarque', seatPassenger: '19C', service: 'WCHR+', gate: '261', status: 'Finalizado' },
-        { id: '7', flyNumber: 'LA 3434', type: 'Embarque', seatPassenger: '23J', service: 'WCHR+', gate: '262', status: 'Finalizado' },
-        { id: '8', flyNumber: 'LA 3435', type: 'Desembarque', seatPassenger: '22F', service: 'WCHR+', gate: '263', status: 'Finalizado' },
-        { id: '9', flyNumber: 'LA 3436', type: 'Embarque', seatPassenger: '20D', service: 'WCHR+', gate: '264', status: 'Finalizado' },
-        { id: '10', flyNumber: 'LA 3437', type: 'Desembarque', seatPassenger: '21C', service: 'WCHR+', gate: '265', status: 'Finalizado' },
-        { id: '11', flyNumber: 'LA 3438', type: 'Embarque', seatPassenger: '27F', service: 'WCHR+', gate: '266', status: 'Finalizado' },
-        { id: '12', flyNumber: 'LA 3439', type: 'Desembarque', seatPassenger: '25G', service: 'WCHR+', gate: '267', status: 'Finalizado' },
-    ];
-
-    // useEffect(() => {
-    //     const fetchData = async () => {
-    //         setItems(exampleData);
-    //         setFilteredItems(exampleData.filter(item => item.status.toLowerCase() === 'iniciado'));
-    //     };
-    //     fetchData();
-    // }, []);
-
-
     useEffect(() => {
-        const fetchData = async() {
-            try {
-                const token = AsyncStorage.getItem("token");
+        fetchData(user.id);    
+    },[]);
 
-                if(!token) {
-                    throw new Error("No token available");
-                }
+    const fetchData = async (USER_ID) => {
 
-                const response = await fetch('https://serverpnae.winglet.app/atendimentos',{
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                    },
-                });
-                if(!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                const data = await response.json();
-                setItems(data);
-                setFilteredItems(data.filter(item => item.status.toLowerCase() === 'ongoing'));
+        try {
+            const token = AsyncStorage.getItem("token");
 
-            } catch(error) {
-                console.error("Request error", error);
-                setItems([]);
-            };
-            fetchData();
-        }
-    }, []);
+            if(!token) {
+                throw new Error("No token available");
+            }
 
+            const response = await fetch('https://serverpnae.winglet.app/atendimentos',{
+                method: 'POST',
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ USER_ID }),
+            });
+
+            if(!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            const data = await response.json();
+
+            dataMap(data);
+
+            setFilteredItems(items.filter(item => item.status === 'ongoing'));
+
+        } catch(error) {
+            console.error("Request error", error);
+        };
+    };
+  
+
+    
     const filterItems = (mode) => {
         setActiveMode(mode);
 
         if (mode === 'ongoing') {
-            setFilteredItems(items.filter(item => item.status.toLowerCase() === 'iniciado'));
+            setFilteredItems(items.filter(item => item.status === 'ongoing'));
             setSearchText('');
         } else if (mode === 'history') {
-            const historyItems = items.filter(item => item.status.toLowerCase() === 'finalizado');
+            const historyItems = items.filter(item => item.status === 'finished');
             setFilteredItems(historyItems);
         }
     };
@@ -125,6 +111,28 @@ const HomeScreen = () => {
         }
         return null;
     };
+
+    const dataMap = (data) => {
+        const result = [];
+
+        for (let index in data) {
+            const item = data[index];
+            const localVar = {};
+
+   
+            localVar.id = item.ID, 
+            localVar.flyNumber = item.FLY_NUMBER, 
+            localVar.type = item.FLY_TYPE, 
+            localVar.seatPassenger = item.SEAT_NUMBER, 
+            localVar.service = item.SERVICE_TYPE, 
+            localVar.gate = item.FLY_GATE,                 
+            localVar.status = item.STATUS_SERVICE
+
+            result.push(localVar)
+        }
+        setItems(result);
+    }
+
 
     {/* Function to choose the recycle list modal */}
     const handleItemPress = (item) => {
