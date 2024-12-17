@@ -19,8 +19,8 @@ const styles = StyleSheet.create({
         position: 'relative',
         left: '25%',
         top: '0%',
-        width: 170, 
-        height: 170, 
+        width: 180, 
+        height: 180, 
         zIndex: 2,      
     },
     form: {
@@ -64,13 +64,13 @@ const styles = StyleSheet.create({
     rectangleLayout: {
         backgroundColor: '#FFF',
         width: '100%',
-        height: '70%',
+        height: '80%',
         position: 'absolute',
-        top: '30%',
+        top: '20%',
         left: 0,
         borderTopRightRadius: 20,
         borderTopLeftRadius: 20,
-        overflow: 'hidden', 
+        //overflow: 'hidden', 
         zIndex: 1,
     },
     atendButton: {
@@ -97,7 +97,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         position: 'relative',
         top: '10%', // Coloca o botão no meio do contêiner verticalmente
-        left: '50%', // Coloca o botão no meio do contêiner horizontalmente
+        left: '48%', // Coloca o botão no meio do contêiner horizontalmente
         transform: [{ translateX: -20 }, { translateY: -20 }], // Ajusta a posição para centralizar completamente (meia largura e altura do botão)
         zIndex: 2, // Ajuste o valor do zIndex conforme necessário
     },
@@ -106,7 +106,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center', 
         position: 'relative', 
         zIndex: 2, 
-        marginTop: "16%",
+        marginTop: "20%",
     },
     FooterTextCompany: {
         fontSize:  12,

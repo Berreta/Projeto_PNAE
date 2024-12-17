@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, FlatList, Image, TextInput, TouchableOpacity } from 'react-native';
 import { useAuth } from '../../context/AuthContext';
 import { FAB, Button, Avatar } from 'react-native-paper';
@@ -21,16 +21,31 @@ const HomeScreen = () => {
     const [checkoutModalVisible, setCheckoutModalVisible] = useState(false);
     const [drawerModalVisible, setDrawerModalVisible] = useState(false);
     const [selectedItem, setSelectedItem] = useState(null);
+    const [isReady, setIsReady] = useState(false);
 
     useEffect(() => {
-        fetchData(user.id);    
-    },[]);
+        const loadInitialData = async () => {
+          if (user !== undefined) {
+            await fetchData(user.id);
+            setIsReady(true);
+          }
+        };
+        console.log("useEffect")
+        loadInitialData();
+      }, [user]);
+
+      useEffect(() => {
+        if (items.length > 0) {
+          setFilteredItems(items.filter(item => item.status === 'ongoing'));
+        }
+      }, [items]);
 
     const fetchData = async (USER_ID) => {
 
         try {
             const token = AsyncStorage.getItem("token");
-
+            console.log("Token home: ", token)
+ 
             if(!token) {
                 throw new Error("No token available");
             }
@@ -50,17 +65,13 @@ const HomeScreen = () => {
 
             const data = await response.json();
 
-            dataMap(data);
-
-            setFilteredItems(items.filter(item => item.status === 'ongoing'));
+            return dataMap(data);
 
         } catch(error) {
             console.error("Request error", error);
         };
     };
   
-
-    
     const filterItems = (mode) => {
         setActiveMode(mode);
 
@@ -154,7 +165,7 @@ const HomeScreen = () => {
                             icon="menu"
                             mode='text'
                             labelStyle={{ color: '#fff' }} 
-                            iconStyle={{ color: '#fff', fontSize: 20 }}
+                            iconStyle={{ color: '#fff'}}
                             onPress={handleDrawerMenu}
                         />
                         <Text style={styles.title}>ATENDIMENTO PNAE</Text>
@@ -174,6 +185,7 @@ const HomeScreen = () => {
                     {/* Buttons to filter the recycle list */}
                     <View style={styles.buttonContainer}>
                         <View style={styles.buttonView}>
+
                             <TouchableOpacity 
                             style={[styles.buttonFilter]}
                             labelStyle={{ color: '#fff' }} 
@@ -182,6 +194,7 @@ const HomeScreen = () => {
                             <Icon name="people" size={15} color="#fff" />
                             <Text style={styles.buttonFilterText}>Em Andamento</Text>
                             </TouchableOpacity>
+
                             <TouchableOpacity 
                             style={[styles.buttonFilter]}
                             labelStyle={{ color: '#fff' }} 
@@ -190,6 +203,7 @@ const HomeScreen = () => {
                             <Icon name="history" size={15} color="#fff" />
                             <Text style={styles.buttonFilterText}>Histórico</Text>
                             </TouchableOpacity>
+
                         </View>
                     </View>
 

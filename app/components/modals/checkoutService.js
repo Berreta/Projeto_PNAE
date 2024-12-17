@@ -1,82 +1,69 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, Modal, TouchableOpacity, Image, KeyboardAvoidingView, ScrollView, Platform } from 'react-native';
+import { View, Text, StyleSheet, Modal, TouchableOpacity, KeyboardAvoidingView, ScrollView, Platform } from 'react-native';
 import { TextInput } from 'react-native-paper';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const CheckoutServiceModal = ({ item, visible, onClose }) => {
-    // Valores iniciais para os estados
+
     const initialState = {
-        service: 'WCHR, BLND...',
-        flightNumber: 'LA3311',
-        ciaName: 'Latam',
-        seatNumber: '25F',
-        gate: '258',
-        type: 'first',
+        dispense: "0",
         occurrence: 'Passageiro estrangeiro, origem Itália. Fala e entende pouco português.',
-        photo: null,
     };
 
-    const [service, setService] = useState(initialState.service);
-    const [flightNumber, setFlightNumber] = useState(initialState.flightNumber);
-    const [ciaName, setCiaName] = useState(initialState.ciaName);
-    const [seatNumber, setSeatNumber] = useState(initialState.seatNumber);
-    const [gate, setGate] = useState(initialState.gate);
-    const [type, setType] = useState(initialState.type);
-    const [occurrence, setOccurence] = useState(initialState.occurrence);
-    const [photo, setPhoto] = useState(initialState.photo);
-    const [dispensed, setDispensed] = useState(false);
+    //const [id, setId] = useState();
+    const [occurrence, setOccurence] = useState();
+    const [dispense, setDispense] = useState();
 
     if (!item) return null;
-
+   
     // Resetar os campos para os valores iniciais quando o modal for fechado
     const handleClose = () => {
-        setService(initialState.service);
-        setFlightNumber(initialState.flightNumber);
-        setCiaName(initialState.ciaName);
-        setSeatNumber(initialState.seatNumber);
-        setGate(initialState.gate);
-        setType(initialState.type);
+        
         setOccurence(initialState.occurrence);
-        setPhoto(initialState.photo);
-        setDispensed(false);
-        onClose();  // Chama a função onClose passada por props
+        setDispense(initialState.dispense);
+        onClose();  
     };
 
     const handleCheckout = async () => {
-        const data = {
-            service,
-            flightNumber,
-            ciaName,
-            seatNumber,
-            gate,
-            type,
-            occurrence,
-            dispensed,
-        };
 
         try {
-            const response = await fetch('https://sua-api-endpoint.com/atendimentos', {
-                method: 'POST',
+            const token = AsyncStorage.getItem("token");
+
+            if(!token) {
+                throw new Error("No token available");
+            }
+
+            const ID = item.id;
+
+            const response = await fetch('https://serverpnae.winglet.app/checkout', {
+                method: 'PUT',
                 headers: {
+                    Authorization: `Bearer ${token}`,
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify(data),
+                body: JSON.stringify({ ID, dispense, occurrence }),
             });
+            console.log("Status: ",response.status)
 
             if (!response.ok) {
                 throw new Error('Erro ao enviar dados');
             }
 
             const responseData = await response.json();
-            console.log('Dados enviados com sucesso:', responseData);
-            //Adicionar toast de sucesso
-            handleClose();  // Resetar o estado e fechar o modal
+
+            console.log(responseData)
+
+            handleClose();  
         } catch (error) {
             console.error('Erro ao enviar dados:', error);
         }
     };
 
     const handleDispenseService = (value) => {
-        setDispensed(!value);
+        console.log(dispense);
+        (value == '0') ? setDispense('1') : setDispense('0');
+        console.log("depois: ", dispense)
+        
     };
 
     return (
@@ -116,14 +103,16 @@ const CheckoutServiceModal = ({ item, visible, onClose }) => {
                                                 styles.radioItem, 
                                                 styles.inputMargin,
                                                 styles.dispensedTextButton,
-                                                dispensed ? styles.enableRadioGroup :
+                                                (dispense == "1") ? styles.enableRadioGroup :
                                                             styles.disableRadioGroup,
                                             ]}
                                             onPress={() => {
-                                                    handleDispenseService(dispensed);
+                                                    handleDispenseService(dispense);
                                                 }
                                             }>
-                                            <Text style={styles.DisableDispensedTextButton}>Serviço dispensado pelo passageiro</Text>
+                                            <Text style={[(dispense == "1") ? styles.radioTextStyleEnable :
+                                                            styles.radioTextStyleDisable]}
+                                                >Serviço dispensado pelo passageiro</Text>
                                         </TouchableOpacity>
                                 </View>
 
@@ -276,6 +265,7 @@ const styles = StyleSheet.create({
         left: '5%',
         right: '5%',
         backgroundColor: 'white',
+        color: '#000'
     },
     enableRadioGroup: {
         position: 'relative',
@@ -317,6 +307,12 @@ const styles = StyleSheet.create({
     infoServiceContainer: {
         left: '5%',
         marginBottom: '2%'
+    },
+    radioTextStyleEnable: {
+        color: '#fff',
+    },
+    radioTextStyleDisable: {
+        color: '#000',
     }
 });
 

@@ -54,7 +54,7 @@ const AddServiceModal = ({ visible, onClose }) => {
     const [type, setType] = useState(initialState.type);
     const [occurrence, setOccurence] = useState(initialState.occurrence);
     const [statusService, setStatusService] = useState(initialState.statusService);
-    const [userID, setUserID] = useState(user.id);
+    //const [userID, setUserID] = useState(user.id);
     // const [photo, setPhoto] = useState(initialState.photo);
     // const [isCameraModalVisible, setIsCameraModalVisible] = useState(false);
 

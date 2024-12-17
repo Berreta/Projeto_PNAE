@@ -137,7 +137,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         height: '8%',
         left: '4%',
-        top: '4%',
+        top: '2%',
     },
     mssgUser: {
         color: 'white',

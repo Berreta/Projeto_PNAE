@@ -1,7 +1,6 @@
 import { StyleSheet  } from "react-native";
 
 const styles = StyleSheet.create({
-
     container: {
         flex: 1,
         backgroundColor: '#E0E0E0',
@@ -19,12 +18,11 @@ const styles = StyleSheet.create({
         zIndex: 0,
     },
     contentView: {
-
     },
     rectangleList: {
         backgroundColor: '#FFF',
         width: '90%',
-        height: 520,
+        height: 494,
         position: 'absolute',
         top: 210,
         left: 20,     
@@ -43,16 +41,15 @@ const styles = StyleSheet.create({
     },
     drawerButton: {
         fontSize: 28,
-        marginRight: -8,
+        marginLeft: '4%'
     },
     title: {
         marginRight: '20%',
         fontSize: 18,
         color: '#fff',
-        left: '12%',   
+        left: '1%',   
         zIndex: 1,
     },
-
     welcomeMssgContainer: {
         position: 'absolute',
         width: '90%',                // O container ocupará 90% da largura
@@ -62,19 +59,17 @@ const styles = StyleSheet.create({
  
         alignItems: 'right', 
         zIndex: 1,      
-      },
-    
+    },
       welcomeUser: {
         fontSize: 14,
         color: '#fff',   
         zIndex: 1,
-      },
-    
+    },
       welcomeMssg: {
         fontSize: 14,
         color: '#fff',
         zIndex: 1,
-      },
+    },
       buttonContainer: {
         flexDirection: 'row',               // Organiza os botões horizontalmente
         justifyContent: 'space-between',    // Cria um espaçamento entre os botões
@@ -85,15 +80,13 @@ const styles = StyleSheet.create({
         left: '5%',                          // Adiciona uma margem à esquerda (para centralizar)
         right: '5%',                         // Adiciona uma margem à direita (para centralizar)
         alignItems: 'center',               // Alinha os botões no centro verticalmente
-      },
-      
+    },   
       buttonView: {
         flexDirection: 'row',               // Coloca os botões em linha (lado a lado)
         justifyContent: 'space-between',    // Cria o espaçamento entre os botões
         flex: 1,                            // Flexível para ocupar o espaço restante
         alignItems: 'center',               // Alinha os botões verticalmente no centro
-      },
-      
+    },
       buttonFilter: {
         flexDirection: 'row',               // Ícone e texto lado a lado
         borderWidth: 2,                     // Bordas visíveis no botão
@@ -104,16 +97,14 @@ const styles = StyleSheet.create({
         justifyContent: 'center',           // Centraliza o conteúdo dentro do botão
         alignItems: 'center',               // Alinha o conteúdo no centro
         width: '48%',                       // Ajusta o tamanho dos botões para que caibam dois lado a lado (cerca de 48% cada um)
-      },
-      
+    },
       buttonFilterText: {
         color: '#fff',
         fontSize: 12,                       // Tamanho da fonte ajustado
         marginLeft: 10,                     // Espaço entre o ícone e o texto
         textAlign: 'center',                // Centraliza o texto horizontalmente
         textAlignVertical: 'center',        // Alinha verticalmente no centro
-      },
-      
+    },    
     item: {
         padding: 12,
         borderBottomWidth: 1,
@@ -191,13 +182,10 @@ const styles = StyleSheet.create({
         padding: 8,
     },
     fab: {
-        position: 'relative',
-        top: 610,
-        margin: 16,
-        left: '46%', // Centraliza horizontalmente
-        bottom: '6%',
+        position: 'absolute',
+        top: '900%',
+        left: '50%', // Centraliza horizontalmente
         backgroundColor: '#A5D6A7',
-        zIndex: 2,
         width: 58, // Largura do FAB
         height: 58, // Altura do FAB
         borderRadius: 28, // Metade da largura e altura para ser circular
@@ -207,19 +195,19 @@ const styles = StyleSheet.create({
         borderRadius: 28, 
         borderWidth: 2,    
         borderColor: '#4CAF50',
+        zIndex: 2,
     },
     
     logoContainer: {
         position: 'absolute',
-        top: 700,
         left: 0,
         right: 0,
+        bottom: 0,
+        height: 100,
         justifyContent: 'center',
         alignItems: 'center',
-        marginTop: 80,
-        flex: 1,
-        height: '8%',
-        zIndex: 2
+        top: '954%',
+       zIndex: 2
     },
     logo: { 
         width: 80, 

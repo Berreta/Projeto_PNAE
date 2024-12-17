@@ -51,7 +51,7 @@ export const AuthProvider = ({ children }) => {
         await AsyncStorage.removeItem('token');
         setUser(null);
     }; 
-
+    
     return (
         <AuthContext.Provider value={{ auth, user, loading, login, logout }}>
             {children}
