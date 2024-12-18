@@ -1,11 +1,10 @@
-{/*
 import React, { useState, useEffect, useRef } from 'react';
 import { Modal, View, Text, StyleSheet, TouchableOpacity } from 'react-native';
-import { Camera, CameraType } from 'expo-camera/legacy';
+import { CameraView } from 'expo-camera';
 
 const CameraModal = ({ visible, onClose, onCapture }) => {
-  const [hasPermission, setHasPermission] = useState(null);
-  const [type, setType] = useState(CameraType.back); 
+  const [hasPermission, setHasPermission] = useState('granted');
+  const [type, setType] = useState('back'); 
   const cameraRef = useRef(null);
 
   useEffect(() => {
@@ -13,7 +12,6 @@ const CameraModal = ({ visible, onClose, onCapture }) => {
       const { status } = await Camera.requestCameraPermissionsAsync();
       setHasPermission(status === 'granted');
     };
-
     getPermissions();
   }, []);
 
@@ -25,20 +23,22 @@ const CameraModal = ({ visible, onClose, onCapture }) => {
     }
   };
 
-  if (hasPermission === null) {
+  if (hasPermission === null) 
     return <Text>Carregando...</Text>;
-  }
-
-  if (hasPermission === false) {
+  
+  if (hasPermission === false) 
     return <Text>Permissão para a câmera negada</Text>;
-  }
-
+  
   // Garantir que o 'type' tenha um valor válido antes de renderizar a câmera
   return (
     <Modal visible={visible} transparent={true}>
       <View style={styles.cameraContainer}>
         {type !== undefined ? (
-          <Camera style={styles.camera} type={type} ref={cameraRef}>
+          <CameraView
+            style={styles.camera} 
+            type={type} 
+            ref={cameraRef}
+          >
             <View style={styles.buttonsContainer}>
               <TouchableOpacity style={styles.captureButton} onPress={handleCapture}>
 
@@ -47,9 +47,9 @@ const CameraModal = ({ visible, onClose, onCapture }) => {
                 <Text style={styles.closeText}>Fechar</Text>
               </TouchableOpacity>
             </View>
-          </Camera>
+          </CameraView>
         ) : (
-          <Text>Erro ao carregar a câmera {type} </Text>
+          <Text>Erro ao carregar a câmera </Text>
         )}
       </View>
     </Modal>
@@ -100,8 +100,6 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
   },
-
 });
 
 export default CameraModal;
-*/}

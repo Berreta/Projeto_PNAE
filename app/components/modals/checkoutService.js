@@ -6,21 +6,21 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 const CheckoutServiceModal = ({ item, visible, onClose }) => {
 
     const initialState = {
-        dispense: "0",
-        occurrence: 'Passageiro estrangeiro, origem Itália. Fala e entende pouco português.',
+        DISPENSE: "0",
+        OCCURRENCE: 'Passageiro estrangeiro, origem Itália. Fala e entende pouco português.',
     };
 
     //const [id, setId] = useState();
-    const [occurrence, setOccurence] = useState();
-    const [dispense, setDispense] = useState();
+    const [OCCURRENCE, setOccurence] = useState();
+    const [DISPENSE, setDispense] = useState();
 
     if (!item) return null;
    
     // Resetar os campos para os valores iniciais quando o modal for fechado
     const handleClose = () => {
         
-        setOccurence(initialState.occurrence);
-        setDispense(initialState.dispense);
+        setOccurence(initialState.OCCURRENCE);
+        setDispense(initialState.DISPENSE);
         onClose();  
     };
 
@@ -34,16 +34,18 @@ const CheckoutServiceModal = ({ item, visible, onClose }) => {
             }
 
             const ID = item.id;
+            const OCCURRENCE = "Sem ocorrências";
+            const DISPENSE = "1" 
+            console.log(ID, OCCURRENCE, DISPENSE)
 
-            const response = await fetch('https://serverpnae.winglet.app/checkout', {
-                method: 'PUT',
+            const response = await fetch('http://localhost:5000/checkout', {
+                method: 'POST',
                 headers: {
-                    Authorization: `Bearer ${token}`,
+                    'Authorization': `Bearer ${token}`,
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ ID, dispense, occurrence }),
+                body: JSON.stringify({ ID, DISPENSE, OCCURRENCE }),
             });
-            console.log("Status: ",response.status)
 
             if (!response.ok) {
                 throw new Error('Erro ao enviar dados');
@@ -51,19 +53,15 @@ const CheckoutServiceModal = ({ item, visible, onClose }) => {
 
             const responseData = await response.json();
 
-            console.log(responseData)
+            handleClose();
 
-            handleClose();  
         } catch (error) {
             console.error('Erro ao enviar dados:', error);
         }
     };
 
     const handleDispenseService = (value) => {
-        console.log(dispense);
         (value == '0') ? setDispense('1') : setDispense('0');
-        console.log("depois: ", dispense)
-        
     };
 
     return (
@@ -103,14 +101,14 @@ const CheckoutServiceModal = ({ item, visible, onClose }) => {
                                                 styles.radioItem, 
                                                 styles.inputMargin,
                                                 styles.dispensedTextButton,
-                                                (dispense == "1") ? styles.enableRadioGroup :
+                                                (DISPENSE == "1") ? styles.enableRadioGroup :
                                                             styles.disableRadioGroup,
                                             ]}
                                             onPress={() => {
-                                                    handleDispenseService(dispense);
+                                                    handleDispenseService(DISPENSE);
                                                 }
                                             }>
-                                            <Text style={[(dispense == "1") ? styles.radioTextStyleEnable :
+                                            <Text style={[(DISPENSE == "1") ? styles.radioTextStyleEnable :
                                                             styles.radioTextStyleDisable]}
                                                 >Serviço dispensado pelo passageiro</Text>
                                         </TouchableOpacity>
@@ -120,7 +118,7 @@ const CheckoutServiceModal = ({ item, visible, onClose }) => {
                                 <TextInput
                                     multiline
                                     label="Ocorrência"
-                                    value={occurrence}
+                                    value={OCCURRENCE}
                                     onChangeText={setOccurence}
                                     onFocus={() => setOccurence('')} // Limpar o campo ao focar
                                     style={[styles.input, styles.textArea, styles.inputMargin]}

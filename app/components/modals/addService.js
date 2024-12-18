@@ -1,16 +1,17 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, Modal, TouchableOpacity, Image, KeyboardAvoidingView, ScrollView, Platform } from 'react-native';
+import { View, Text, StyleSheet, Modal, TouchableOpacity, 
+        Image, KeyboardAvoidingView, ScrollView, Platform,
+        TouchableWithoutFeedback  } from 'react-native';
 import { TextInput, RadioButton } from 'react-native-paper';
 import { useAuth } from '../../context/AuthContext'
 
-// import iconButton from '../../../assets/images/img_vector.png';
-// import CameraModal from './camera';
-// import MultiSelectInput from '../MultiSelectInput';
+import iconButton from '../../../assets/images/img_vector.png';
+import CameraModal from './camera';
+import MultiSelectInput from '../MultiSelectInput';
 
 const AddServiceModal = ({ visible, onClose }) => {
     
     const { user } = useAuth();
-
 
     const initialState = {
         service: 'WCHR, BLND...',
@@ -54,14 +55,15 @@ const AddServiceModal = ({ visible, onClose }) => {
     const [type, setType] = useState(initialState.type);
     const [occurrence, setOccurence] = useState(initialState.occurrence);
     const [statusService, setStatusService] = useState(initialState.statusService);
-    //const [userID, setUserID] = useState(user.id);
-    // const [photo, setPhoto] = useState(initialState.photo);
-    // const [isCameraModalVisible, setIsCameraModalVisible] = useState(false);
+    const [userID, setUserID] = useState(user.id);
+    const [photo, setPhoto] = useState(initialState.photo);
+    const [isCameraModalVisible, setIsCameraModalVisible] = useState(false);
+    const [scale,setScale] = useState(1);
 
-    // const handleCapture = (capturedPhotoUri) => {
-    //     setPhoto(capturedPhotoUri);
-    //     setIsCameraModalVisible(false);
-    // };
+    const handleCapture = (capturedPhotoUri) => {
+        setPhoto(capturedPhotoUri);
+        setIsCameraModalVisible(false);
+    };
 
     // Resetar os campos para os valores iniciais quando o modal for fechado
     const handleClose = () => {
@@ -72,12 +74,13 @@ const AddServiceModal = ({ visible, onClose }) => {
         setGate(initialState.gate);
         setType(initialState.type);
         setOccurence(initialState.occurrence);
-        // setPhoto(initialState.photo);
+        setPhoto(initialState.photo);
         setStatusService(initialState.statusService);
         onClose(); 
     };
 
     const handleSave = async () => {
+        console.log("Send button pressed")
         const data = {
             ciaName,
             gate,
@@ -87,7 +90,6 @@ const AddServiceModal = ({ visible, onClose }) => {
             flightNumber,
             additionalService,
             connectionFlight,
-            //boardingCardPicture,
             service,
             statusService,
             occurrence,
@@ -95,7 +97,7 @@ const AddServiceModal = ({ visible, onClose }) => {
             dispense,
             userID,
         };
-
+        
         try {
             const response = await fetch('https://serverpnae.winglet.app/novoAtendimento', {
                 method: 'POST',
@@ -104,8 +106,6 @@ const AddServiceModal = ({ visible, onClose }) => {
                 },
                 body: JSON.stringify(data),
             });
-
-            console.log(data)
 
             if (!response.ok) {
                 throw new Error('Erro ao enviar dados');
@@ -120,6 +120,17 @@ const AddServiceModal = ({ visible, onClose }) => {
             console.error('Erro ao enviar dados:', error);
         }
     };
+
+    // Função para aumentar a imagem ao pressionar
+    const onPressIn = () => {
+        setScale(3.5);  // Aumenta o tamanho da imagem
+    };
+
+    // Função para voltar ao tamanho original
+    const onPressOut = () => {
+        setScale(1);  // Retorna ao tamanho normal
+    };
+
 
     return (
         <Modal
@@ -138,20 +149,20 @@ const AddServiceModal = ({ visible, onClose }) => {
 
                             <View style={styles.formContainer}>
 
-                                <View style={styles.row}>
-                                    {/* <MultiSelectInput 
+                                <View style={styles.rowComponent}>
+                                    <MultiSelectInput 
                                         label={initialState.service} 
-                                        items={serviceOptions}
-                                        style={styles.MultiSelectInputStyle} /> */}
+                                        items={serviceOptions} 
+                                    />
 
-                                <TextInput
+                                {/* <TextInput
                                         label="Serviços"
                                         value={service}
                                         onChangeText={setService}
                                         onFocus={() => setService('')}
                                         style={[styles.serviceInput]}
                                         mode="outlined"
-                                    />                   
+                                    />                    */}
                                 </View>
 
                                 <View style={styles.row}>
@@ -172,10 +183,6 @@ const AddServiceModal = ({ visible, onClose }) => {
                                         style={[styles.gateInput]}
                                         mode="outlined"
                                     />
-                                    {/* <MultiSelectInput 
-                                        style={styles.fieldFormStyle} 
-                                        label={initialState.ciaName} 
-                                        items={ciaNameOptions} /> */}
                                 </View>
 
                                 <View style={styles.row}>
@@ -227,20 +234,24 @@ const AddServiceModal = ({ visible, onClose }) => {
                                     mode="outlined"
                                 />
 
-                                {/* Show photo *
                                 {photo ? (
                                     <View style={styles.previewContainer}>
-                                        <Text>Foto Capturada:</Text>
-                                        <Image source={{ uri: photo }} style={styles.previewImage} />
+                                        <Text style={styles.textPreviewImage}>Foto Capturada:</Text>
+                                        <TouchableWithoutFeedback 
+                                            onPressIn={onPressIn} 
+                                            onPressOut={onPressOut}
+                                        >
+                                            <Image source={{ uri: photo }} style={[styles.previewImage, {transform: [{scale}]}]} />
+                                        </TouchableWithoutFeedback>
                                     </View>
                                 ) : (
                                     <TouchableOpacity style={styles.uploadPhotoButton} onPress={() => setIsCameraModalVisible(true)}>
                                         <Image 
                                             source={iconButton} 
-                                            style={styles.uploadImage} 
+                                            style={styles.uploadImage}
                                         />
                                         <Text style={styles.uploadTextBlue}>Foto do Cartão de Embarque</Text>
-                                        <Text style={styles.uploadTextBlack}>SVG, PNG, JPG ou GIF (max. 3MB)</Text>
+                                        <Text style={styles.uploadTextBlack}>SVG, PNG, JPG</Text>
                                     </TouchableOpacity>
                                 )}
 
@@ -248,7 +259,7 @@ const AddServiceModal = ({ visible, onClose }) => {
                                     visible={isCameraModalVisible}
                                     onClose={() => setIsCameraModalVisible(false)}
                                     onCapture={handleCapture}
-                                />*/}
+                                />
                             </View>
 
                             <View style={styles.footer}>
@@ -276,7 +287,7 @@ const styles = StyleSheet.create({
     },
     modalContent: {
         width: '90%',
-        height: '90%',
+        height: 700,
         padding: 10,
         backgroundColor: 'white',
         borderRadius: 10,
@@ -290,35 +301,37 @@ const styles = StyleSheet.create({
         marginBottom: '5%',
     },
     formContainer: {
-        width: '100%',
-        flex: 1,
+        width: '95%',
+        //flex: 1,
     },
     row: {
+        height: 54,
         flexDirection: 'row',
         justifyContent: 'space-between', // Usando "space-between" para distribuir os itens igualmente
-        flex: 0.1, // Garante que todas as linhas terão a mesma altura
+        //flex: 0.1, // Garante que todas as linhas terão a mesma altura
+        marginBottom: '2%',
+      },
+      rowComponent: {
+        height: 57,
+        flexDirection: 'row',
+        justifyContent: 'space-between', // Usando "space-between" para distribuir os itens igualmente
+        //flex: 0.1, // Garante que todas as linhas terão a mesma altura
         marginBottom: '2%',
       },
       serviceInput: {
-        // Estilo ajustado
         width: '100%',
-        height: 60,
       },
       flightInput: {
         width: '40%', // Ajustado para garantir consistência
-        height: 20, // Garantindo que a altura ocupe 100% da altura da row
       },
       fieldFormStyle: {
         width: '55%', // Garantindo que o espaço restante seja utilizado
-        height: 100,
       },
       seatInput: {
         width: '40%', // Ajustado para garantir consistência
-        height: 20,
       },
       gateInput: {
         width: '55%', // Ajustado para garantir consistência
-        //height: '100%',
       },
     textArea: {
         width: '90%',
@@ -327,9 +340,11 @@ const styles = StyleSheet.create({
         height: 120,
     },
     input: {  
+        top: 20,
         fontSize: 12,
     },
     radioGroup: {
+        top: 10,
         flexDirection: 'row',
         justifyContent: 'flex-start',
         marginTop: 12,
@@ -350,7 +365,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'space-around',
         width: '100%',
-        marginTop: 20,
+        marginTop: 38,
         marginBottom: '2%',
     },
     button: {
@@ -376,6 +391,7 @@ const styles = StyleSheet.create({
     },
 
     uploadPhotoButton: {
+        top: 10,
         backgroundColor: '#fff',
         borderColor: '#ccc',
         borderWidth: 2,
@@ -385,7 +401,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
         width: '89%',
-        marginTop: 20,
+        marginTop: 28,
         marginLeft: 20,
     },
     uploadImage: {
@@ -402,23 +418,25 @@ const styles = StyleSheet.create({
         textAlign: 'center',
     },
     previewContainer: {
-        marginTop: 20,
+        top: 10,
         alignItems: 'center',
         width: '100%',
         marginTop: 20,
         marginBottom: '2%',
     },
+    textPreviewImage: {
+        marginBottom: 10,
+    },
     previewImage: {
         width: 100,
         height: 100,
         resizeMode: 'contain',
+        zIndex: 2,
     },
     scrollViewContent: {
         flexGrow: 1,
     },
-    MultiSelectInputStyle: {
-        height: 5,
-    }
+
 });
 
 export default AddServiceModal;

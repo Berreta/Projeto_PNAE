@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet } from 'react-native';
-import { TextInput, Checkbox, List } from 'react-native-paper';
+import { View, StyleSheet, ScrollView, TouchableWithoutFeedback } from 'react-native';
+import { Checkbox, List } from 'react-native-paper';
 
 const MultiSelectInput = ({ label, items }) => {
   const [selectedItems, setSelectedItems] = useState([]);
@@ -20,7 +20,15 @@ const MultiSelectInput = ({ label, items }) => {
     });
   };
 
+  // Função para fechar o Accordion quando pressionar fora da área
+  const handlePressOutside = () => {
+    if (expanded) {
+      setExpanded(false);  // Fecha o Accordion se ele estiver aberto
+    }
+  };
+
   return (
+    // <TouchableWithoutFeedback onPress={handlePressOutside}>
     <View style={styles.container}>
       {/* Accordion com sobreposição */}
       <List.Accordion
@@ -30,35 +38,37 @@ const MultiSelectInput = ({ label, items }) => {
         expanded={expanded}
         onPress={() => setExpanded(!expanded)} // Alterna o estado de expansão
       >
-        {/* Lista de itens, com estilo para sobrepor os outros conteúdos */}
+        {/* Lista de itens, agora com rolagem */}
         <View style={[styles.dropdown, expanded && { zIndex: 10 }]}>
-          {items.map(item => (
-            <List.Item
-              key={item}
-              title={item}
-              left={() => (
-                <Checkbox
-                  status={selectedItems.includes(item) ? 'checked' : 'unchecked'}
-                  onPress={() => handleCheckboxChange(item)}
+          {expanded && (
+            <ScrollView style={styles.scrollView}>  {/* ScrollView para rolagem */}
+              {items.map(item => (
+                <List.Item
+                  key={item}
+                  title={item}
+                  left={() => (
+                    <Checkbox
+                      status={selectedItems.includes(item) ? 'checked' : 'unchecked'}
+                      onPress={() => handleCheckboxChange(item)}
+                    />
+                  )}
                 />
-              )}
-            />
-          ))}
+              ))}
+            </ScrollView>
+          )}
         </View>
       </List.Accordion>
-
     </View>
+    // </TouchableWithoutFeedback>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    //padding: 16,
     backgroundColor: '#fff',
   },
   accordion: {
-    //marginBottom: 16,
     borderWidth: 1,
     borderColor: '#000',
     borderRadius: 5,
@@ -66,16 +76,19 @@ const styles = StyleSheet.create({
   },
   dropdown: {
     position: 'absolute',
-    top: 50, // Ajuste conforme a altura do Accordion
+    top: 50, 
     left: 0,
     right: 0,
     backgroundColor: 'white',
-    padding: 10,
+    padding: 6,
     borderWidth: 1,
     borderColor: '#ccc',
     borderRadius: 4,
+    maxHeight:200
   },
-
+  scrollView: {
+    maxHeight: 200, 
+  },
 });
 
 export default MultiSelectInput;
