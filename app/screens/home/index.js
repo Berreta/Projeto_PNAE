@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, FlatList, Image, TextInput, TouchableOpacity } from 'react-native';
+import { View, Text, FlatList, Image, TextInput, TouchableOpacity, ActivityIndicator  } from 'react-native';
 import { useAuth } from '../../context/AuthContext';
 import { FAB, Button, Avatar } from 'react-native-paper';
 import styles from './styles';
@@ -71,6 +71,17 @@ const HomeScreen = () => {
         };
     };
   
+
+    const handleCloseAddModal = () => {
+        setAddServiceModalVisible(false);
+        fetchData(user.id);
+    }
+
+    const handleCloseCheckoutModal = () => {
+        setCheckoutModalVisible(false);
+        fetchData(user.id);
+    }
+
     const filterItems = (mode) => {
         setActiveMode(mode);
 
@@ -80,23 +91,6 @@ const HomeScreen = () => {
         } else if (mode === 'history') {
             const historyItems = items.filter(item => item.status === 'finished');
             setFilteredItems(historyItems);
-        }
-    };
-
-    const handleSearch = (text) => {
-        setSearchText(text);
-        if (activeMode === 'history') {
-            const filtered = items.filter(item =>
-                item.status.toLowerCase() === 'finished' &&
-                (
-                    item.flyNumber.includes(text) || 
-                    item.type.includes(text) ||
-                    item.gate.includes(text) ||
-                    item.seatPassenger.includes(text) ||
-                    item.service.includes(text)
-                )
-            );
-            setFilteredItems(filtered);
         }
     };
 
@@ -129,7 +123,6 @@ const HomeScreen = () => {
             const item = data[index];
             const localVar = {};
 
-   
             localVar.id = item.ID, 
             localVar.flyNumber = item.FLY_NUMBER, 
             localVar.type = item.FLY_TYPE, 
@@ -143,6 +136,22 @@ const HomeScreen = () => {
         setItems(result);
     }
 
+    const handleSearch = (text) => {
+        setSearchText(text);
+        if (activeMode === 'history') {
+            const filtered = items.filter(item =>
+                item.status.toLowerCase() === 'finished' &&
+                (
+                    item.flyNumber.includes(text) || 
+                    item.type.includes(text) ||
+                    //item.gate.includes(text) ||
+                    item.seatPassenger.includes(text) ||
+                    item.service.includes(text)
+                )
+            );
+            setFilteredItems(filtered);
+        }
+    };
 
     {/* Function to choose the recycle list modal */}
     const handleItemPress = (item) => {
@@ -205,6 +214,8 @@ const HomeScreen = () => {
 
                         </View>
                     </View>
+                     
+   
 
                     {/* Recycle list */}
                     <View style={styles.rectangleList}>
@@ -246,13 +257,13 @@ const HomeScreen = () => {
                     {/* Fecha o modal para adicionar um serviço */}
                     <AddServiceModal 
                         visible={addServiceModalVisible} 
-                        onClose={() => setAddServiceModalVisible(false)}
+                        onClose={() => handleCloseAddModal()}
                     />
 
                     {/* Checkout Modal */}
                     <CheckoutServiceModal 
                         visible={checkoutModalVisible}
-                        onClose={() => setCheckoutModalVisible(false)}
+                        onClose={() => handleCloseCheckoutModal()}
                         item={selectedItem}
                     />
 

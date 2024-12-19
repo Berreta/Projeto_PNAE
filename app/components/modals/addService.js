@@ -13,7 +13,7 @@ const AddServiceModal = ({ visible, onClose }) => {
 
     const { user } = useAuth();
     const [isReady, setIsReady] = useState(false);
-    const [service, setService] = useState('');
+    const [service, setService] = useState('');//
     const [flightNumber, setFlightNumber] = useState('');
     const [ciaName, setCiaName] = useState('');
     const [seatNumber, setSeatNumber] = useState('');
@@ -29,8 +29,8 @@ const AddServiceModal = ({ visible, onClose }) => {
     useEffect(() => {
         const loadUserInfo = async () => {
           if (user !== undefined) {
+            setInitialValues()
             setIsReady(true);
-            console.log("Infos user loaded!", user.id);
           }
         };
         loadUserInfo();
@@ -75,17 +75,7 @@ const AddServiceModal = ({ visible, onClose }) => {
         setIsCameraModalVisible(false);
     };
 
-    // Resetar os campos para os valores iniciais quando o modal for fechado
     const handleClose = () => {
-        setService(initialState.service);
-        setFlightNumber(initialState.flightNumber);
-        setCiaName(initialState.ciaName);
-        setSeatNumber(initialState.seatNumber);
-        setGate(initialState.gate);
-        setType(initialState.type);
-        setOccurence(initialState.occurrence);
-        setPhoto(initialState.photo);
-        setStatusService(initialState.statusService);
         onClose(); 
     };
 
@@ -99,12 +89,13 @@ const AddServiceModal = ({ visible, onClose }) => {
         setOccurence(initialState.occurrence);
         setPhoto(initialState.photo);
         setStatusService(initialState.statusService);
+        setUserID(user.id);
     }
 
     const handleSave = async () => {
         const CIA_NAME = ciaName;
         const FLY_GATE = gate;
-        const OCURRENCE = occurrence;
+        const OCCURRENCE = occurrence;
         const FLY_TYPE = 'Embarque';
         const SEAT_NUMBER = seatNumber;
         const FLY_NUMBER = flightNumber;
@@ -122,38 +113,34 @@ const AddServiceModal = ({ visible, onClose }) => {
             if (!token) {
                 throw new Error("No token available");
             }
-    
-            const formData = new FormData();
-            formData.append("CIA_NAME", CIA_NAME);
-            formData.append("FLY_GATE", FLY_GATE);
-            formData.append("OCURRENCE", OCURRENCE);
-            formData.append("FLY_TYPE", FLY_TYPE);
-            formData.append("SEAT_NUMBER", SEAT_NUMBER);
-            formData.append("FLY_NUMBER", FLY_NUMBER);
-            formData.append("ADDITIONAL_SERVICE", ADDITIONAL_SERVICE);
-            formData.append("CONNECTION_FLIGHT", CONNECTION_FLIGHT);
-            formData.append("SERVICE_TYPE", SERVICE_TYPE);
-            formData.append("STATUS_SERVICE", STATUS_SERVICE);
-            formData.append("DISPENSE", DISPENSE);
-            formData.append("USER_ID", user.id);
-            
-            if (photo) {
-                const imageUri = { uri: photo, type: 'image/jpeg', name: 'boarding_card.jpg' };
-                formData.append('BOARDING_CARD_PICTURE', imageUri);
-            }
 
             const response = await fetch('https://serverpnae.winglet.app/novoAtendimento', {
                 method: 'POST',
                 headers: {
                     'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json',
                 },
-                body: formData,
+                body: JSON.stringify({
+                    CIA_NAME,
+                    FLY_GATE,
+                    OCCURRENCE,
+                    FLY_TYPE,
+                    SEAT_NUMBER,
+                    FLY_NUMBER,
+                    ADDITIONAL_SERVICE,
+                    CONNECTION_FLIGHT,
+                    SERVICE_TYPE,
+                    STATUS_SERVICE,
+                    BOARDING_CARD_PICTURE,
+                    DISPENSE,
+                    USER_ID
+                }),
             });
     
             const responseData = await response.json();
     
             if (response.ok) {
-                console.log("Dados enviados com sucesso!", responseData);
+                console.log("Atendimento criado com sucesso!");
             } else {
                 throw new Error('Erro ao enviar dados');
             }
@@ -197,15 +184,6 @@ const AddServiceModal = ({ visible, onClose }) => {
                                         label={initialState.service} 
                                         items={serviceOptions} 
                                     />
-
-                                {/* <TextInput
-                                        label="Serviços"
-                                        value={service}
-                                        onChangeText={setService}
-                                        onFocus={() => setService('')}
-                                        style={[styles.serviceInput]}
-                                        mode="outlined"
-                                    />                    */}
                                 </View>
 
                                 <View style={styles.row}>
@@ -479,7 +457,6 @@ const styles = StyleSheet.create({
     scrollViewContent: {
         flexGrow: 1,
     },
-
 });
 
 export default AddServiceModal;

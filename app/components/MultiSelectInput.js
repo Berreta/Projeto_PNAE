@@ -21,11 +21,11 @@ const MultiSelectInput = ({ label, items }) => {
   };
 
   // Função para fechar o Accordion quando pressionar fora da área
-  const handlePressOutside = () => {
-    if (expanded) {
-      setExpanded(false);  // Fecha o Accordion se ele estiver aberto
-    }
-  };
+  // const handlePressOutside = () => {
+  //   if (expanded) {
+  //     setExpanded(false);  // Fecha o Accordion se ele estiver aberto
+  //   }
+  // };
 
   return (
     // <TouchableWithoutFeedback onPress={handlePressOutside}>
