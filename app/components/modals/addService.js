@@ -1,17 +1,40 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, Modal, TouchableOpacity, 
         Image, KeyboardAvoidingView, ScrollView, Platform,
         TouchableWithoutFeedback  } from 'react-native';
 import { TextInput, RadioButton } from 'react-native-paper';
 import { useAuth } from '../../context/AuthContext'
-
 import iconButton from '../../../assets/images/img_vector.png';
 import CameraModal from './camera';
 import MultiSelectInput from '../MultiSelectInput';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const AddServiceModal = ({ visible, onClose }) => {
-    
+
     const { user } = useAuth();
+    const [isReady, setIsReady] = useState(false);
+    const [service, setService] = useState('');
+    const [flightNumber, setFlightNumber] = useState('');
+    const [ciaName, setCiaName] = useState('');
+    const [seatNumber, setSeatNumber] = useState('');
+    const [gate, setGate] = useState('');
+    const [type, setType] = useState('');
+    const [occurrence, setOccurence] = useState('');
+    const [statusService, setStatusService] = useState('');
+    const [userID, setUserID] = useState('');
+    const [photo, setPhoto] = useState('');
+    const [isCameraModalVisible, setIsCameraModalVisible] = useState(false);
+    const [scale,setScale] = useState(1);
+
+    useEffect(() => {
+        const loadUserInfo = async () => {
+          if (user !== undefined) {
+            setIsReady(true);
+            console.log("Infos user loaded!", user.id);
+          }
+        };
+        loadUserInfo();
+      }, [user]);
 
     const initialState = {
         service: 'WCHR, BLND...',
@@ -47,19 +70,6 @@ const AddServiceModal = ({ visible, onClose }) => {
         'United',
       ];
 
-    const [service, setService] = useState(initialState.service);
-    const [flightNumber, setFlightNumber] = useState(initialState.flightNumber);
-    const [ciaName, setCiaName] = useState(initialState.ciaName);
-    const [seatNumber, setSeatNumber] = useState(initialState.seatNumber);
-    const [gate, setGate] = useState(initialState.gate);
-    const [type, setType] = useState(initialState.type);
-    const [occurrence, setOccurence] = useState(initialState.occurrence);
-    const [statusService, setStatusService] = useState(initialState.statusService);
-    const [userID, setUserID] = useState(user.id);
-    const [photo, setPhoto] = useState(initialState.photo);
-    const [isCameraModalVisible, setIsCameraModalVisible] = useState(false);
-    const [scale,setScale] = useState(1);
-
     const handleCapture = (capturedPhotoUri) => {
         setPhoto(capturedPhotoUri);
         setIsCameraModalVisible(false);
@@ -79,42 +89,75 @@ const AddServiceModal = ({ visible, onClose }) => {
         onClose(); 
     };
 
+    const setInitialValues = async () => {
+        setService(initialState.service);
+        setFlightNumber(initialState.flightNumber);
+        setCiaName(initialState.ciaName);
+        setSeatNumber(initialState.seatNumber);
+        setGate(initialState.gate);
+        setType(initialState.type);
+        setOccurence(initialState.occurrence);
+        setPhoto(initialState.photo);
+        setStatusService(initialState.statusService);
+    }
+
     const handleSave = async () => {
-        console.log("Send button pressed")
-        const data = {
-            ciaName,
-            gate,
-            occurrence,
-            type,
-            seatNumber,
-            flightNumber,
-            additionalService,
-            connectionFlight,
-            service,
-            statusService,
-            occurrence,
-            gate,
-            dispense,
-            userID,
-        };
-        
+        const CIA_NAME = ciaName;
+        const FLY_GATE = gate;
+        const OCURRENCE = occurrence;
+        const FLY_TYPE = 'Embarque';
+        const SEAT_NUMBER = seatNumber;
+        const FLY_NUMBER = flightNumber;
+        const ADDITIONAL_SERVICE = '0';
+        const CONNECTION_FLIGHT = '0';
+        const SERVICE_TYPE = service;
+        const STATUS_SERVICE = 'ongoing';
+        const BOARDING_CARD_PICTURE = photo;
+        const DISPENSE = '0';
+        const USER_ID = user.id;
+    
         try {
+            const token = await AsyncStorage.getItem("token");
+            
+            if (!token) {
+                throw new Error("No token available");
+            }
+    
+            const formData = new FormData();
+            formData.append("CIA_NAME", CIA_NAME);
+            formData.append("FLY_GATE", FLY_GATE);
+            formData.append("OCURRENCE", OCURRENCE);
+            formData.append("FLY_TYPE", FLY_TYPE);
+            formData.append("SEAT_NUMBER", SEAT_NUMBER);
+            formData.append("FLY_NUMBER", FLY_NUMBER);
+            formData.append("ADDITIONAL_SERVICE", ADDITIONAL_SERVICE);
+            formData.append("CONNECTION_FLIGHT", CONNECTION_FLIGHT);
+            formData.append("SERVICE_TYPE", SERVICE_TYPE);
+            formData.append("STATUS_SERVICE", STATUS_SERVICE);
+            formData.append("DISPENSE", DISPENSE);
+            formData.append("USER_ID", user.id);
+            
+            if (photo) {
+                const imageUri = { uri: photo, type: 'image/jpeg', name: 'boarding_card.jpg' };
+                formData.append('BOARDING_CARD_PICTURE', imageUri);
+            }
+
             const response = await fetch('https://serverpnae.winglet.app/novoAtendimento', {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`,
                 },
-                body: JSON.stringify(data),
+                body: formData,
             });
-
-            if (!response.ok) {
+    
+            const responseData = await response.json();
+    
+            if (response.ok) {
+                console.log("Dados enviados com sucesso!", responseData);
+            } else {
                 throw new Error('Erro ao enviar dados');
             }
-
-            const responseData = await response.json();
-
-            console.log('Dados enviados com sucesso:', responseData);
-
+    
             handleClose();
         } catch (error) {
             console.error('Erro ao enviar dados:', error);

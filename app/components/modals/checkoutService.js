@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, Modal, TouchableOpacity, KeyboardAvoidingView, ScrollView, Platform } from 'react-native';
 import { TextInput } from 'react-native-paper';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -8,26 +8,29 @@ const CheckoutServiceModal = ({ item, visible, onClose }) => {
     const initialState = {
         DISPENSE: "0",
         OCCURRENCE: 'Passageiro estrangeiro, origem Itália. Fala e entende pouco português.',
+        STATUS_SERVICE: 'ongoing',
     };
 
     //const [id, setId] = useState();
     const [OCCURRENCE, setOccurence] = useState();
     const [DISPENSE, setDispense] = useState();
+    const [STATUS_SERVICE, setStatusService] = useState();
 
     if (!item) return null;
-   
+
     // Resetar os campos para os valores iniciais quando o modal for fechado
     const handleClose = () => {
         
         setOccurence(initialState.OCCURRENCE);
         setDispense(initialState.DISPENSE);
+        setStatusService(initialState.STATUS_SERVICE);
         onClose();  
     };
 
     const handleCheckout = async () => {
 
         try {
-            const token = AsyncStorage.getItem("token");
+            const token = await AsyncStorage.getItem("token");
 
             if(!token) {
                 throw new Error("No token available");
@@ -35,28 +38,33 @@ const CheckoutServiceModal = ({ item, visible, onClose }) => {
 
             const ID = item.id;
             const OCCURRENCE = "Sem ocorrências";
-            const DISPENSE = "1" 
-            console.log(ID, OCCURRENCE, DISPENSE)
+            const DISPENSE = "1" ;
+            const STATUS_SERVICE = "finished";
+            //console.log(ID, OCCURRENCE, DISPENSE, STATUS_SERVICE)
 
-            const response = await fetch('http://localhost:5000/checkout', {
-                method: 'POST',
+            const response = await fetch('https://serverpnae.winglet.app/checkout', {
+                method: 'PUT',
                 headers: {
                     'Authorization': `Bearer ${token}`,
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ ID, DISPENSE, OCCURRENCE }),
+                body: JSON.stringify({ ID, DISPENSE, OCCURRENCE, STATUS_SERVICE }),
             });
+            if(response.ok)
+                console.log('Dados enviados com sucesso')
 
             if (!response.ok) {
                 throw new Error('Erro ao enviar dados');
             }
 
             const responseData = await response.json();
+            console.log(responseData);
 
             handleClose();
 
         } catch (error) {
             console.error('Erro ao enviar dados:', error);
+            throw new Error(`Erro ao enviar dados: ${errorData.message || response.statusText}`);
         }
     };
 

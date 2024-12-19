@@ -30,7 +30,6 @@ const HomeScreen = () => {
             setIsReady(true);
           }
         };
-        console.log("useEffect")
         loadInitialData();
       }, [user]);
 
